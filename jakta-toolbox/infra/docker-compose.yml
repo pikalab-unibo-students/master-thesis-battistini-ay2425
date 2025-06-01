@@ -45,20 +45,6 @@ services:
       - opensearch-network
     restart: unless-stopped
 
-  bridge:
-    build:
-      context: ./bridge
-    container_name: node-app
-    ports:
-      - "4173:4173"
-    depends_on:
-      - logstash
-    environment:
-      NODE_ENV: production
-    networks:
-      - logstash-network
-    restart: unless-stopped
-
 networks:
   logstash-network:
   opensearch-network:

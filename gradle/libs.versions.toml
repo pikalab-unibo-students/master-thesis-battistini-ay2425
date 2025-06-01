@@ -48,6 +48,7 @@ tuprolog-dsl-theory = { module = "it.unibo.tuprolog:dsl-theory-jvm", version.ref
 tuprolog-dsl-solve = { module = "it.unibo.tuprolog:dsl-solve-jvm", version.ref = "tuprolog" }
 tuprolog-oop-lib = { module = "it.unibo.tuprolog:oop-lib-jvm", version.ref = "tuprolog" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 openai = { module = "com.aallam.openai:openai-client", version.ref = "openai" }
 kotlin-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
