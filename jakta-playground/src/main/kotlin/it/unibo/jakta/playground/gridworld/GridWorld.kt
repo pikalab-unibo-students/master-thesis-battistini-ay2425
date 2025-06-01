@@ -1,4 +1,4 @@
-package it.unibo.jakta.playground.explorer.gridworld
+package it.unibo.jakta.playground.gridworld
 
 import it.unibo.jakta.agents.bdi.engine.AgentID
 import it.unibo.jakta.agents.bdi.engine.actions.ExternalAction
@@ -8,7 +8,7 @@ import it.unibo.jakta.agents.bdi.engine.environment.impl.EnvironmentImpl
 import it.unibo.jakta.agents.bdi.engine.logging.loggers.MasLogger
 import it.unibo.jakta.agents.bdi.engine.messages.MessageQueue
 import it.unibo.jakta.agents.bdi.engine.perception.Perception
-import it.unibo.jakta.playground.explorer.gridworld.logging.ObjectReachedEvent
+import it.unibo.jakta.playground.gridworld.logging.ObjectReachedEvent
 
 class GridWorld(
     agentIDs: Map<String, AgentID> = emptyMap(),
@@ -22,7 +22,7 @@ class GridWorld(
     private val beliefFactory = BeliefFactory()
 
     init {
-        perception = Perception.of(updatedPercepts())
+        perception = Perception.of(getPercepts())
     }
 
     private fun createGrid(): Grid {
@@ -41,7 +41,7 @@ class GridWorld(
 
     private fun getCurrentState(): GridWorldState? {
         val agentPosition = data.currentPosition()?.let { Position(it.x, it.y) } ?: return null
-        val objectPositions =
+        val objectsPosition =
             (data.objects() ?: defaultObjects).mapValues { (_, cell) ->
                 Position(cell.x, cell.y)
             }
@@ -49,7 +49,7 @@ class GridWorld(
         return GridWorldState(
             grid = grid,
             agentPosition = agentPosition,
-            objects = objectPositions,
+            objectsPosition = objectsPosition,
             availableDirections = Direction.entries.toSet(),
         )
     }
@@ -80,9 +80,12 @@ class GridWorld(
         }
     }
 
-    override fun percept() = BeliefBase.of(updatedPercepts())
+    override fun percept(): BeliefBase {
+        perception = Perception.of(getPercepts())
+        return super.percept()
+    }
 
-    private fun updatedPercepts(): List<Belief> {
+    private fun getPercepts(): List<Belief> {
         val currentState = getCurrentState() ?: return emptyList()
 
         val directionBeliefs = beliefFactory.createDirectionBeliefs(currentState)
@@ -131,7 +134,7 @@ class GridWorld(
         internal val defaultObjects =
             mapOf(
                 "rock" to Cell(1, 0),
-                "home" to Cell(4, 4),
+                "home" to Cell(DEFAULT_GRID_SIZE - 1, DEFAULT_GRID_SIZE - 1),
             )
 
         internal val defaultObstacles =

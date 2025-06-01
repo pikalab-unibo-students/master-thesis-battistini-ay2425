@@ -1,8 +1,8 @@
-package it.unibo.jakta.playground.explorer.gridworld.serialization
+package it.unibo.jakta.playground.gridworld.serialization
 
 import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
 import it.unibo.jakta.agents.bdi.engine.serialization.modules.SerializersModuleProvider
-import it.unibo.jakta.playground.explorer.gridworld.logging.ObjectReachedEvent
+import it.unibo.jakta.playground.gridworld.logging.ObjectReachedEvent
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass

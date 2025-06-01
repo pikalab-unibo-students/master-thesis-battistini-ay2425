@@ -1,4 +1,4 @@
-package it.unibo.jakta.playground.explorer.gridworld
+package it.unibo.jakta.playground.gridworld
 
 enum class Direction(
     val dx: Int,

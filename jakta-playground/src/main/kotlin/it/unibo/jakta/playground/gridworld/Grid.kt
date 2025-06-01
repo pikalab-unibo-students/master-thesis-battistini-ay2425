@@ -1,8 +1,8 @@
-package it.unibo.jakta.playground.explorer.gridworld
+package it.unibo.jakta.playground.gridworld
 
 class Grid(
     val size: Int,
-    val obstacles: Set<Position>,
+    val obstacles: Set<Position> = emptySet(),
 ) {
     fun isInBoundaries(position: Position): Boolean = position.x in 0 until size && position.y in 0 until size
 

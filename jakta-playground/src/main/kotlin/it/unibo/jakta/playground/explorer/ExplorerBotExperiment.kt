@@ -1,5 +1,6 @@
 package it.unibo.jakta.playground.explorer
 
+import it.unibo.jakta.agents.bdi.dsl.actions.ActionMetadata.meaning
 import it.unibo.jakta.agents.bdi.dsl.loggingConfig
 import it.unibo.jakta.agents.bdi.dsl.mas
 import it.unibo.jakta.agents.bdi.engine.executionstrategies.ExecutionStrategy
@@ -10,7 +11,7 @@ import it.unibo.jakta.playground.experiment.AbstractExperiment
 import it.unibo.jakta.playground.explorer.ExplorerBot.explorerBot
 import it.unibo.jakta.playground.explorer.ExplorerBot.getDirectionToMove
 import it.unibo.jakta.playground.explorer.ExplorerBot.move
-import it.unibo.jakta.playground.explorer.gridworld.GridWorld
+import it.unibo.jakta.playground.gridworld.GridWorld
 
 class ExplorerBotExperiment : AbstractExperiment() {
     override fun createMas(

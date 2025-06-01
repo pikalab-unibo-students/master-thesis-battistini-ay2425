@@ -1,4 +1,4 @@
-package it.unibo.jakta.playground.explorer.gridworld
+package it.unibo.jakta.playground.gridworld
 
 import it.unibo.jakta.agents.bdi.engine.beliefs.Belief
 import it.unibo.jakta.agents.bdi.engine.beliefs.Belief.Companion.SOURCE_PERCEPT
@@ -23,7 +23,7 @@ class BeliefFactory {
             )
 
     fun createObjectBeliefs(state: GridWorldState) =
-        state.objects.map {
+        state.objectsPosition.map {
             val functor = "object"
             val struct = Struct.of(functor, Atom.of(it.key))
             Belief.wrap(
@@ -56,7 +56,7 @@ class BeliefFactory {
     }
 
     fun createThereIsBeliefs(state: GridWorldState) =
-        state.objects.mapNotNull { (objectName, position) ->
+        state.objectsPosition.mapNotNull { (objectName, position) ->
             val direction = state.agentPosition.directionTo(position)
             if (direction != null &&
                 (

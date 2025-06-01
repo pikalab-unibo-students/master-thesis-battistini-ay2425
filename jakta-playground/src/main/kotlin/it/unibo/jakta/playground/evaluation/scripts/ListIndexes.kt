@@ -1,7 +1,6 @@
 package it.unibo.jakta.playground.evaluation.scripts
 
 import it.unibo.jakta.playground.evaluation.IndexSearch.getAgentsFromMas
-import it.unibo.jakta.playground.evaluation.IndexSearch.getMasTraces
 import it.unibo.jakta.playground.evaluation.IndexSearch.getPlanGenProceduresFromAgent
 import it.unibo.jakta.playground.evaluation.KTSearch
 import it.unibo.jakta.playground.evaluation.KTSearch.retrieveIndexNames
@@ -12,7 +11,7 @@ fun main() {
     println("Querying ${client.version()}")
 
     val indexNames = client.retrieveIndexNames()
-    val masOnlyIndices = getMasTraces(indexNames)
+    val masOnlyIndices = indexNames // getMasTraces(indexNames)
     masOnlyIndices
         .forEach { masId ->
             val masId = masId.substringAfter("-mas-")

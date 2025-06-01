@@ -15,12 +15,15 @@ repositories {
 }
 
 dependencies {
+    api(project(":jakta-narrative-generation"))
     api(project(":jakta-dsl"))
     api(project(":jakta-plan-generation"))
 
+    api(libs.kotlin.coroutines)
+    api(libs.ktor.network)
+
     implementation(libs.bundles.kotlin.testing)
     implementation(libs.bundles.kotlin.logging)
-    implementation(libs.kotlin.coroutines)
     implementation(libs.openai)
     implementation(libs.clikt)
     implementation(libs.bundles.koin)
@@ -66,6 +69,22 @@ tasks.register<JavaExec>("replayExperiment") {
     args = additionalArgs
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass = "${project.group}.playground.ExperimentReplayerKt"
+}
+
+tasks.register<JavaExec>("matchFile") {
+    description = "Run the pattern matcher on a file."
+    group = "application"
+
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "${project.group}.playground.evaluation.scripts.MatchFileKt"
+}
+
+tasks.register<JavaExec>("matchStream") {
+    description = "Run the pattern matcher on a stream of TCP data."
+    group = "application"
+
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "${project.group}.playground.evaluation.scripts.MatchStreamKt"
 }
 
 tasks.register<JavaExec>("runBaseline") {

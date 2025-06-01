@@ -1,6 +1,7 @@
 package it.unibo.jakta.playground.explorer
 
 import it.unibo.jakta.agents.bdi.dsl.MasScope
+import it.unibo.jakta.agents.bdi.dsl.actions.ActionMetadata.meaning
 import it.unibo.jakta.agents.bdi.dsl.beliefs.BeliefMetadata.meaning
 import it.unibo.jakta.agents.bdi.dsl.goals.TriggerMetadata.meaning
 import it.unibo.jakta.agents.bdi.dsl.plans
@@ -10,7 +11,7 @@ import it.unibo.jakta.agents.bdi.engine.beliefs.Belief
 import it.unibo.jakta.agents.bdi.engine.beliefs.Belief.Companion.SOURCE_PERCEPT
 import it.unibo.jakta.agents.bdi.engine.plans.Plan
 import it.unibo.jakta.agents.bdi.generationstrategies.lm.strategy.LMGenerationStrategy
-import it.unibo.jakta.playground.explorer.gridworld.GridWorld
+import it.unibo.jakta.playground.gridworld.GridWorld
 import it.unibo.tuprolog.core.Struct
 import it.unibo.tuprolog.core.Substitution
 import it.unibo.tuprolog.core.Var

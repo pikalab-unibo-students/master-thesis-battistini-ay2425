@@ -1,6 +1,6 @@
-package it.unibo.jakta.playground
+package it.unibo.jakta.playground.explorer.gridworld
 
-import it.unibo.jakta.playground.explorer.gridworld.GridWorld
+import it.unibo.jakta.playground.gridworld.GridWorld
 
 fun main() {
     val gridWorld = GridWorld()

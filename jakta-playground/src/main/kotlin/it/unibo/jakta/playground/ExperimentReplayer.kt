@@ -19,7 +19,7 @@ import it.unibo.jakta.agents.bdi.generationstrategies.lm.pipeline.formatting.Def
 import it.unibo.jakta.playground.MockGenerationStrategy.createOneStepStrategyWithMockedAPI
 import it.unibo.jakta.playground.explorer.ExplorerBot.explorerBot
 import it.unibo.jakta.playground.explorer.ExplorerBot.gridWorld
-import it.unibo.jakta.playground.explorer.gridworld.serialization.GlobalJsonModule
+import it.unibo.jakta.playground.gridworld.serialization.GlobalJsonModule
 import org.koin.ksp.generated.module
 import java.io.File
 import java.util.UUID
@@ -108,7 +108,7 @@ class ExperimentReplayer : CliktCommand() {
     }
 }
 
-fun main(args: Array<String>) =
+fun main(args: Array<String>): Unit =
     ExperimentReplayer()
         .context { terminal = Terminal(ansiLevel = AnsiLevel.TRUECOLOR, interactive = true) }
         .main(args)
