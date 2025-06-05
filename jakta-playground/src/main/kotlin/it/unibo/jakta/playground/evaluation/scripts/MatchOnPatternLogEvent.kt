@@ -5,9 +5,10 @@ import it.unibo.jakta.agents.bdi.engine.AgentID
 import it.unibo.jakta.agents.bdi.engine.depinjection.JaktaKoin
 import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig
 import it.unibo.jakta.agents.bdi.engine.logging.events.EventType
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEventContainer
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEventContext
 import it.unibo.jakta.agents.bdi.engine.serialization.modules.JsonModule
+import it.unibo.jakta.agents.bdi.narrativegenerator.StopWatch
 import it.unibo.jakta.agents.bdi.narrativegenerator.converter.EventSerializer
 import it.unibo.jakta.agents.bdi.narrativegenerator.converter.EventSerializer.Companion.structOfEvent
 import it.unibo.jakta.agents.bdi.narrativegenerator.converter.EventSerializerConfig
@@ -34,7 +35,7 @@ data class GenericEvent(
     val target: AgentID? = null,
     val tag: Set<String> = emptySet(),
     override val description: String?,
-) : JaktaLogEvent {
+) : LogEvent {
     companion object {
         fun of(
             type: String,
@@ -60,7 +61,7 @@ fun main() {
 //    )
 
     val logger =
-        NarrativeGenerationLogger.of(
+        NarrativeGenerationLogger.create(
             "PatternMatcher",
             LoggingConfig(
                 logToServer = false,
@@ -149,7 +150,8 @@ fun main() {
                 }
             }
 
-    val eventProcessor = IncrementalEventProcessor(kb, KnowledgeBase.empty(converter, logger), patterns, logger)
+    val stopWatch = StopWatch()
+    val eventProcessor = IncrementalEventProcessor(kb, patterns, stopWatch, logger)
     val finalProcessor = eventProcessor.matchAll(events)
 
     finalProcessor.eventMatchResults.last().activePartialMatches shouldBe 2
@@ -157,9 +159,9 @@ fun main() {
     val patternMatches = finalProcessor.matcher.completedMatches
     patternMatches.size shouldBe 2
 
-    val msg = PatternMatchLogEvent.from(patternMatches.first())
+    val msg = PatternMatchLogEvent.from(patternMatches.first(), events.last().timestamp)
 
-    logger.info { ObjectMessage(JaktaLogEventContainer(msg)) }
+    logger.info { ObjectMessage(LogEventContext(msg)) }
 
     val clauses = kb.add(LogEntry.create(msg), "id").modifiedClauses.map { it.clause }
     println(clauses)

@@ -11,8 +11,8 @@ import it.unibo.jakta.playground.gridworld.Position
 data class HouseState(
     val fridgeOpen: Boolean = false,
     val carryingBeer: Boolean = false,
-    val sipCount: Int = 0,
-    val availableBeers: Int = 2,
+    val sipCount: Int = START_SIP_COUNT,
+    val availableBeers: Int = START_BEER_COUNT,
     val gridSize: Int = DEFAULT_GRID_SIZE,
     val robotPosition: Position = DEFAULT_START_POSITION,
     val grid: Grid = Grid(gridSize),
@@ -62,7 +62,7 @@ data class HouseState(
     fun handInBeer() =
         if (carryingBeer) {
             copy(
-                sipCount = 10,
+                sipCount = MAX_SIP_COUNT,
                 carryingBeer = false,
             )
         } else {
@@ -75,4 +75,10 @@ data class HouseState(
         } else {
             null
         }
+
+    companion object {
+        const val MAX_SIP_COUNT = 3
+        const val START_SIP_COUNT = 0
+        const val START_BEER_COUNT = 1
+    }
 }

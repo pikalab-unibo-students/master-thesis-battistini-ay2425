@@ -1,4 +1,4 @@
-package it.unibo.jakta.playground
+package it.unibo.jakta.playground.evaluation.scripts
 
 import it.unibo.jakta.agents.bdi.engine.Agent
 import it.unibo.jakta.agents.bdi.engine.actions.ActionSignature
@@ -39,7 +39,7 @@ import it.unibo.jakta.agents.bdi.engine.logging.events.ActionEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.BdiEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.GoalEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.MessageEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.PlanEvent
 import it.unibo.jakta.agents.bdi.engine.messages.Achieve
@@ -63,7 +63,8 @@ import java.io.File
 fun main() {
     val config = defaultConfig
     val converter = EventSerializer.of(config)
-    val logger = NarrativeGenerationLogger.of("PatternMatcher", LoggingConfig())
+    val loggingConfig = LoggingConfig()
+    val logger = NarrativeGenerationLogger.create("PatternMatcher", loggingConfig)
     val eventKB = KnowledgeBase.empty(converter, logger)
 
     val fakeEventId = "id"
@@ -75,7 +76,7 @@ fun main() {
         "This document contains a comprehensive list of all Jakta's log events and their properties.\n\n",
     )
 
-    fun readEvent(event: JaktaLogEvent) {
+    fun readEvent(event: LogEvent) {
         stringBuilder.append("## ${event.javaClass.simpleName}\n\n")
 
         val clauses = eventKB.add(LogEntry.create(event), fakeEventId).modifiedClauses.map { it.clause }

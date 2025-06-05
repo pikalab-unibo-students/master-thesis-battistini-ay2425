@@ -126,7 +126,7 @@ class HouseEnvironment(
         )
 
     companion object {
-        const val FAKE_DELIVERY_TIME_MS = 1200L
+        const val FAKE_DELIVERY_TIME_MS = 200L
 
         internal const val DEFAULT_GRID_SIZE = 5
 

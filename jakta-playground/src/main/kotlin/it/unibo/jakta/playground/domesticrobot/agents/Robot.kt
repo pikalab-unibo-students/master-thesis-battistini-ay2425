@@ -1,28 +1,29 @@
 package it.unibo.jakta.playground.domesticrobot.agents
 
 import it.unibo.jakta.agents.bdi.dsl.MasScope
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Amount
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Limit
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.NewQuantity
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.OrderId
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Place
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Quantity
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Thing
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Time
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.achieve
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.beer
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.fridge
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.owner
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.robot
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.supermarket
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.tell
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.close
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.hand_in
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.move_towards
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.open
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.pick
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.send
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.time
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Amount
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Limit
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.NewQuantity
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.OrderId
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Place
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Quantity
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Thing
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Time
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.achieve
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.beer
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.fridge
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.owner
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.robot
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.supermarket
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.tell
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.close
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.hand_in
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.move_towards
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.open
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.pick
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.send
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.stop
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.time
 import it.unibo.tuprolog.core.Atom
 import it.unibo.tuprolog.core.Substitution
 import java.time.Instant
@@ -30,11 +31,15 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 object Robot {
+    const val MAX_BEER_ALLOWED = 5
+    const val EMPTY_STOCK = 0
+    const val BEERS_TO_ORDER = 3
+
     fun MasScope.robotAgent() =
         agent(robot.value) {
             beliefs {
                 +fact { "available"(beer, fridge) }
-                +fact { "limit"(beer, 10) }
+                +fact { "limit"(beer, MAX_BEER_ALLOWED) }
                 +fact { "consumed"(beer, 0) }
                 +rule {
                     "too_much"(Thing) impliedBy (
@@ -61,7 +66,7 @@ object Robot {
                 +achieve("has"(owner, beer)) onlyIf {
                     not("available"(beer, fridge).fromSelf)
                 } then {
-                    send(supermarket, achieve, "order"(beer, 5).source("robot"))
+                    send(supermarket, achieve, "order"(beer, BEERS_TO_ORDER).source("robot"))
                 }
 
                 +achieve("has"(owner, beer)) onlyIf {
@@ -69,6 +74,8 @@ object Robot {
                 } then {
                     val cnt = "The Department of Health does not allow me to give you more beers than"
                     send(owner, tell, "msg"(cnt, Limit))
+                    send(supermarket, tell, "stop")
+                    stop()
                 }
 
                 +achieve("at"(robot, Place)) onlyIf { "at"(robot, Place).fromPercept }

@@ -38,13 +38,10 @@ object KTSearch {
                 }
         }
 
-    fun createClient() =
-        SearchClient(
-            KtorRestClient(
-                host = "localhost",
-                port = 9200,
-            ),
-        )
+    fun createClient(
+        host: String = "localhost",
+        port: Int = 9200,
+    ) = SearchClient(KtorRestClient(host = host, port = port))
 
     fun SearchClient.version(): String =
         runBlocking {

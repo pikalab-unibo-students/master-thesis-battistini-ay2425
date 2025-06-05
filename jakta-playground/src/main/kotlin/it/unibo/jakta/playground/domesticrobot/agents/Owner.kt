@@ -2,18 +2,19 @@ package it.unibo.jakta.playground.domesticrobot.agents
 
 import it.unibo.jakta.agents.bdi.dsl.MasScope
 import it.unibo.jakta.agents.bdi.dsl.plans.PlanMetadata.meaning
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Limit
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.Time
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.achieve
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.beer
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.owner
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.robot
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.Literals.tell
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.print
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.random
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.send
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.sip
-import it.unibo.jakta.playground.domesticrobot.DomesticRobotMas.sleep
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Limit
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.Time
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.achieve
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.beer
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.owner
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.robot
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.Literals.tell
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.print
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.random
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.send
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.sip
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.sleep
+import it.unibo.jakta.playground.domesticrobot.DomesticRobotUtils.stop
 import it.unibo.tuprolog.core.Numeric
 import it.unibo.tuprolog.core.Substitution
 import kotlin.random.Random
@@ -74,11 +75,12 @@ object Owner {
 
                 +"msg"(C, Limit).source("robot") then {
                     print(C, Limit)
+                    stop()
                 }
             }
             actions {
                 action("random", "number") {
-                    val random = Numeric.of(Random.nextInt(1000, 2000))
+                    val random = Numeric.of(Random.nextInt(100, 200))
                     val output = arguments[0].asVar()
                     output?.let { addResults(Substitution.unifier(it to random)) }
                 }

@@ -4,256 +4,188 @@ import it.unibo.jakta.agents.bdi.narrativegenerator.dsl.PatternClauseMetadata.me
 import it.unibo.jakta.agents.bdi.narrativegenerator.dsl.event
 import it.unibo.jakta.agents.bdi.narrativegenerator.dsl.pattern
 import it.unibo.jakta.agents.bdi.narrativegenerator.model.SiftingPattern
+import it.unibo.jakta.playground.domesticrobot.agents.Robot.EMPTY_STOCK
 import it.unibo.tuprolog.core.Var
 
+@Suppress("LocalVariableName", "ktlint:standard:property-naming")
 object SiftingPatterns {
-    val sendMessage =
-        pattern("SendMessage") {
-            val e1 = varOf("E1")
-            val speechAct = varOf("SpeechAct")
-            val sender = varOf("Sender")
-            val recipient = varOf("Recipient")
+    val RequestEvent = Var.of("Request")
+    val Owner = Var.of("Owner")
+    val Robot = Var.of("Robot")
+    val Thing = Var.of("Thing")
+    val Supermarket = Var.of("Supermarket")
+    val Quantity = Var.of("Quantity")
 
-            +event(e1) {
-                +"type"(e1, "SendMessage")
-                +"message_type"(e1, speechAct)
-                +"message_from"(e1, sender)
-                +"recipient"(e1, recipient)
-            }.meaning {
-                +"$sender sent a $speechAct message to $recipient"
-            }
-        }
-
-    val requestEvent = Var.of("Request")
-    val ownerAgent = Var.of("Owner")
-    val robotAgent = Var.of("Robot")
-    val supermarketAgent = Var.of("Supermarket")
-
-    val messageReceived =
-        event(requestEvent) {
-            +"type"("MessageReceived")
-            +"message_from"(ownerAgent)
-            +"message_type"("achieve")
-            +"message_value"("has"(ownerAgent, "beer"))
-            +"agent"(robotAgent)
+    val messageReceivedHasOwnerThing =
+        event(RequestEvent) {
+            +"type"(RequestEvent, "MessageReceived")
+            +"message_from"(RequestEvent, Owner)
+            +"message_type"(RequestEvent, "achieve")
+            +"message_value"(RequestEvent, "has"(Owner, Thing))
+            +"agent"(RequestEvent, Robot)
         }.meaning {
-            "$ownerAgent requested beer from $robotAgent"
+            +"$Owner requested $Thing from $Robot"
         }
 
-    /**
-     * As an owner,
-     * I want to request beer from my robot,
-     * So that I can receive it without leaving my seat.
-     */
-    val beerRequestAndDelivery =
-        pattern("BeerRequestAndDelivery") {
-            val beerFetchEvent = varOf("Fetch")
-            val deliverEvent = varOf("Deliver")
+    val thingRequestAndDelivery =
+        pattern("ThingRequestAndDelivery") {
+            val FetchEvent = varOf("Fetch")
+            val DeliverEvent = varOf("Deliver")
 
-            +messageReceived
+            +messageReceivedHasOwnerThing
 
-            +event(beerFetchEvent) {
-                +"type"("ActionSuccess")
-                +"action_signature_name"("pick")
-                +"provided_arguments"("beer")
-                +"agent"(robotAgent)
+            +event(FetchEvent) {
+                +"type"(FetchEvent, "ActionSuccess")
+                +"action_signature_name"(FetchEvent, "pick")
+                +"provided_arguments"(FetchEvent, Thing)
+                +"agent"(FetchEvent, Robot)
             }.meaning {
-                "$robotAgent took beer from the fridge"
+                +"$Robot took $Thing from the fridge"
             }
 
-            +event(deliverEvent) {
-                +"type"("BeliefAddition")
-                +"belief_content"("has"(ownerAgent, "beer"))
-                +"agent"(ownerAgent)
+            +event(DeliverEvent) {
+                +"type"(DeliverEvent, "BeliefAddition")
+                +"belief_content"(DeliverEvent, "has"(Owner, Thing))
+                +"agent"(DeliverEvent, Owner)
             }.meaning {
-                "$robotAgent delivered beer to $ownerAgent"
+                +"$Robot delivered $Thing to $Owner"
             }
+
+            description =
+                """
+                The ${eventClauses[0].purpose}, so the ${eventClauses[1].purpose} and ${eventClauses[2].purpose} 
+                """.trimIndent()
         }
 
-    /**
-     * As a robot following health department rules,
-     * I want to enforce daily beer consumption limits,
-     * So that I comply with regulations.
-     */
     val dailyLimitEnforcement =
         pattern("DailyLimitEnforcement") {
-            val checkEvent = varOf("Check")
-            val rejectEvent = varOf("rReject")
-            val limitValue = varOf("Limit")
+            val RejectEvent = varOf("rReject")
+            val LimitValue = varOf("Limit")
 
-            +messageReceived
+            +messageReceivedHasOwnerThing
 
-            +event(checkEvent) {
-                +"type"("BeliefAddition")
-                +"belief_content"("too_much"("beer"))
-                +"agent"(robotAgent)
-            }.meaning {
-                "$robotAgent detected daily limit reached"
-            }
-
-            +event(rejectEvent) {
-                +"type"("SendMessage")
-                +"message_from"(robotAgent)
-                +"message_type"("tell")
+            +event(RejectEvent) {
+                +"type"(RejectEvent, "SendMessage")
+                +"message_from"(RejectEvent, Robot)
+                +"message_type"(RejectEvent, "tell")
                 +"message_value"(
-                    "msg"("The Department of Health does not allow me to give you more beers than", limitValue),
+                    RejectEvent,
+                    "msg"("The Department of Health does not allow me to give you more beers than", LimitValue),
                 )
-                +"recipient"(ownerAgent)
+                +"recipient"(RejectEvent, Owner)
             }.meaning {
-                "$robotAgent informed $ownerAgent about reaching daily limit"
+                +"$Robot informed $Owner about reaching daily limit"
             }
+
+            description =
+                """
+                Since the ${eventClauses[0].purpose} and the daily limit has been reached, the ${eventClauses[1].purpose}.
+                """.trimIndent()
         }
 
-    /**
-     * As a robot,
-     * I want to detect when beer is out of stock and order more,
-     * So that I can continue serving the owner's requests.
-     */
     val outOfStockOrdering =
         pattern("OutOfStockOrdering") {
-            val stockCheck = varOf("Check")
-            val orderEvent = varOf("Order")
+            val StockCheck = varOf("Check")
+            val OrderEvent = varOf("Order")
 
-            +event(stockCheck) {
-                +"type"("BeliefAddition")
-                +"belief_content"("stock"("beer", 0))
-                +"agent"(robotAgent)
+            +event(StockCheck) {
+                +"type"(StockCheck, "BeliefAddition")
+                +"belief_content"(StockCheck, "stock"(Thing, EMPTY_STOCK))
+                +"agent"(StockCheck, Robot)
             }.meaning {
-                "$robotAgent detected beer is out of stock"
+                +"$Robot detected $Thing is out of stock"
             }
 
-            +event(orderEvent) {
-                +"type"("SendMessage")
-                +"message_from"(robotAgent)
-                +"message_type"("achieve")
-                +"message_value"("order"("beer", 5))
-                +"recipient"(supermarketAgent)
+            val msgPayload = "order"(Thing, Quantity).source("robot")
+
+            +event(OrderEvent) {
+                +"type"(OrderEvent, "SendMessage")
+                +"message_from"(OrderEvent, Robot)
+                +"message_type"(OrderEvent, "achieve")
+                +"message_value"(OrderEvent, msgPayload)
+                +"recipient"(OrderEvent, Supermarket)
             }.meaning {
-                "$robotAgent ordered more beer from $supermarketAgent"
+                +"$Robot ordered more $Thing from $Supermarket"
             }
+
+            description =
+                """
+                The ${eventClauses[0].purpose} so the ${eventClauses[1].purpose}
+                """.trimIndent()
         }
 
-    /**
-     * As a supermarket,
-     * I want to process and deliver beer orders from robots,
-     * So that they can maintain their stock.
-     */
-    val beerDelivery =
-        pattern("BeerDelivery") {
-            val orderReceived = varOf("Receive")
-            val deliveryEvent = varOf("Delivery")
-            val quantity = varOf("Quantity")
-            val orderId = varOf("OrderId")
+    val thingDelivery =
+        pattern("ThingDelivery") {
+            val OrderReceived = varOf("Receive")
+            val DeliveryEvent = varOf("Delivery")
+            val OrderId = varOf("OrderId")
 
-            +event(orderReceived) {
-                +"type"("MessageReceived")
-                +"message_from"(robotAgent)
-                +"message_type"("achieve")
-                +"message_value"("order"("beer", quantity))
-                +"agent"(supermarketAgent)
+            val msgPayload = "order"(Thing, Quantity).source("robot")
+
+            +event(OrderReceived) {
+                +"type"(OrderReceived, "MessageReceived")
+                +"message_from"(OrderReceived, Robot)
+                +"message_type"(OrderReceived, "achieve")
+                +"message_value"(OrderReceived, msgPayload)
+                +"agent"(OrderReceived, Supermarket)
             }.meaning {
-                "$supermarketAgent received order for $quantity beers from $robotAgent"
+                +"$Supermarket received order for $Quantity ${Thing}s from $Robot"
             }
 
-            +event(deliveryEvent) {
-                +"type"("SendMessage")
-                +"message_from"(supermarketAgent)
-                +"message_type"("tell")
-                +"message_value"("delivered"("beer", quantity, orderId))
-                +"recipient"(robotAgent)
+            +event(DeliveryEvent) {
+                +"type"(DeliveryEvent, "SendMessage")
+                +"message_from"(DeliveryEvent, Supermarket)
+                +"message_type"(DeliveryEvent, "tell")
+                +"message_value"(DeliveryEvent, "delivered"(Thing, Quantity, OrderId))
+                +"recipient"(DeliveryEvent, Robot)
             }.meaning {
-                "$supermarketAgent delivered $quantity beers to $robotAgent"
+                +"$Supermarket delivered $Quantity ${Thing}s to $Robot"
             }
+
+            description =
+                """
+                Since the ${eventClauses[0].purpose} the ${eventClauses[1].purpose}
+                """.trimIndent()
         }
 
-    /**
-     * As an owner,
-     * I want to check the time when I'm bored,
-     * So that I can stay informed.
-     */
     val timeCheckBehavior =
         pattern("TimeCheckBehavior") {
-            val timeRequest = varOf("Request")
-            val timeResponse = varOf("Response")
-            val currentTime = varOf("Time")
+            val TimeRequest = varOf("Request")
+            val TimeResponse = varOf("Response")
+            val CurrentTime = varOf("Time")
 
-            +event(timeRequest) {
-                +"type"("SendMessage")
-                +"message_from"(ownerAgent)
-                +"message_type"("tell")
-                +"message_value"("askTime")
-                +"recipient"(robotAgent)
+            +event(TimeRequest) {
+                +"type"(TimeRequest, "SendMessage")
+                +"message_from"(TimeRequest, Owner)
+                +"message_type"(TimeRequest, "tell")
+                +"message_value"(TimeRequest, "askTime")
+                +"recipient"(TimeRequest, Robot)
             }.meaning {
-                "$ownerAgent asked $robotAgent for the time"
+                +"$Owner asked $Robot for the time"
             }
 
-            +event(timeResponse) {
-                +"type"("SendMessage")
-                +"message_from"(robotAgent)
-                +"message_type"("tell")
-                +"message_value"("time"(currentTime))
-                +"recipient"(ownerAgent)
+            +event(TimeResponse) {
+                +"type"(TimeResponse, "SendMessage")
+                +"message_from"(TimeResponse, Robot)
+                +"message_type"(TimeResponse, "tell")
+                +"message_value"(TimeResponse, "time"(CurrentTime))
+                +"recipient"(TimeResponse, Owner)
             }.meaning {
-                "$robotAgent told $ownerAgent the current time: $currentTime"
-            }
-        }
-
-    /**
-     * As a robot,
-     * I want to order more beer when the stock falls below a threshold,
-     * So that we never completely run out of beer.
-     */
-    val stockReorderThreshold =
-        pattern("StockReorderThreshold") {
-            val checkEvent = varOf("Check")
-            val thresholdEvent = varOf("Threshold")
-            val orderEvent = varOf("Order")
-            val ackEvent = varOf("Ack")
-            val stock = varOf("Stock")
-            val threshold = varOf("Threshold")
-
-            +event(checkEvent) {
-                +"type"("BeliefAddition")
-                +"belief_content"("stock"(stock))
-                +"agent"(robotAgent)
-            }.meaning {
-                "$robotAgent checked beer stock: $stock bottles"
+                +"$Robot told $Owner that the current time is: $CurrentTime"
             }
 
-            +event(thresholdEvent) {
-                +"type"("BeliefAddition")
-                +"belief_content"("below_threshold"(stock, threshold))
-                +"agent"(robotAgent)
-            }.meaning {
-                "$robotAgent determined stock ($stock) is below threshold ($threshold)"
-            }
-
-            +event(orderEvent) {
-                +"type"("SendMessage")
-                +"message_from"(robotAgent)
-                +"message_value"("ordered"("beer", 10))
-                +"recipient"(supermarketAgent)
-            }.meaning {
-                "$robotAgent ordered more beer from $supermarketAgent"
-            }
-
-            +event(ackEvent) {
-                +"type"("BeliefAddition")
-                +"belief_source"(supermarketAgent)
-                +"belief_content"("order_received")
-                +"agent"(robotAgent)
-            }.meaning {
-                "$supermarketAgent confirmed the order to $robotAgent"
-            }
+            description =
+                """
+                The ${eventClauses[0].purpose} so the ${eventClauses[1].purpose}
+                """.trimIndent()
         }
 
     val domesticRobotPatterns: List<SiftingPattern> =
         listOf(
-            beerRequestAndDelivery,
+            thingRequestAndDelivery,
             dailyLimitEnforcement,
             outOfStockOrdering,
-            beerDelivery,
+            thingDelivery,
             timeCheckBehavior,
-            stockReorderThreshold,
         )
 }

@@ -1,13 +1,6 @@
 package it.unibo.jakta.playground.domesticrobot
 
-import it.unibo.jakta.agents.bdi.dsl.mas
 import it.unibo.jakta.agents.bdi.dsl.plans.BodyScope
-import it.unibo.jakta.agents.bdi.engine.executionstrategies.ExecutionStrategy
-import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig
-import it.unibo.jakta.playground.domesticrobot.agents.Owner.ownerAgent
-import it.unibo.jakta.playground.domesticrobot.agents.Robot.robotAgent
-import it.unibo.jakta.playground.domesticrobot.agents.Supermarket.supermarketAgent
-import it.unibo.jakta.playground.domesticrobot.environment.HouseDsl.houseEnvironment
 import it.unibo.tuprolog.core.Atom
 import it.unibo.tuprolog.core.Numeric
 import it.unibo.tuprolog.core.Struct
@@ -17,23 +10,7 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 @Suppress("FunctionName")
-object DomesticRobotMas {
-    val drMas =
-        mas {
-            loggingConfig =
-                LoggingConfig(
-                    logToFile = true,
-                    logDir = "jakta-playground/logs/",
-                    logToSingleFile = true,
-                )
-            executionStrategy = ExecutionStrategy.oneThreadPerAgent()
-
-            houseEnvironment()
-            robotAgent()
-            ownerAgent()
-            supermarketAgent()
-        }
-
+object DomesticRobotUtils {
     private fun BodyScope.executeSafely(
         command: String,
         vararg args: Any,
@@ -48,7 +25,7 @@ object DomesticRobotMas {
                         else -> null
                     }
                 }.ifEmpty { null }
-        safeArgs?.let { execute(Struct.of(command, it)) }
+        safeArgs?.let { execute(Struct.of(command, it)) } ?: execute(Struct.of(command))
     }
 
     // External actions

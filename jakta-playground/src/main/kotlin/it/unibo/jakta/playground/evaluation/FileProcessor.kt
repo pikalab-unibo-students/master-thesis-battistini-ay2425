@@ -2,6 +2,7 @@ package it.unibo.jakta.playground.evaluation
 
 import it.unibo.jakta.agents.bdi.engine.serialization.modules.JaktaJsonComponent.json
 import it.unibo.jakta.agents.bdi.narrativegenerator.logging.LogEntry
+import it.unibo.jakta.agents.bdi.narrativegenerator.logging.NarrativeGenerationLogger
 import java.io.BufferedReader
 import java.io.File
 
@@ -14,6 +15,7 @@ object FileProcessor {
 
     private fun processLines(
         reader: BufferedReader,
+        logger: NarrativeGenerationLogger? = null,
         processFunction: (LogEntry) -> Unit,
     ) {
         var lineCount = 0
@@ -27,13 +29,13 @@ object FileProcessor {
                         json.decodeFromString<LogEntry>(line)
                     } catch (e: Exception) {
                         errorCount++
-                        print("Error parsing line $lineCount: ${e.message}")
+                        logger?.warn { "Could not parse line $lineCount: ${e.message} as a LogEntry." }
                         null
                     }
                 logEntry?.let { processFunction(it) }
             }
         }
-        println("Processing complete. Total entries: $lineCount, Errors: $errorCount")
+        logger?.info { "Processing complete. Total entries: $lineCount, Events not parseable: $errorCount" }
     }
 
     /**
@@ -41,11 +43,12 @@ object FileProcessor {
      */
     fun processFile(
         logFilePath: String,
+        logger: NarrativeGenerationLogger? = null,
         processFunction: (LogEntry) -> Unit,
     ) {
         val file = File(logFilePath)
         val reader = file.bufferedReader()
-        processLines(reader, processFunction)
+        processLines(reader, logger, processFunction)
     }
 
     /**
@@ -53,9 +56,11 @@ object FileProcessor {
      */
     fun processResource(
         resourcePath: String,
+        logger: NarrativeGenerationLogger? = null,
         processFunction: (LogEntry) -> Unit,
     ) {
         val reader = readResourceFile(resourcePath)
-        reader?.let { processLines(it, processFunction) } ?: println("Resource not found: $resourcePath")
+        reader?.let { processLines(it, logger, processFunction) }
+            ?: logger?.error { "Resource not found: $resourcePath" }
     }
 }

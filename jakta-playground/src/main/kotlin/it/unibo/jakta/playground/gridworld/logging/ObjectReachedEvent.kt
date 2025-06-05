@@ -1,6 +1,6 @@
 package it.unibo.jakta.playground.gridworld.logging
 
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.EnvironmentEvent
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,6 +9,6 @@ import kotlinx.serialization.Serializable
 data class ObjectReachedEvent(
     val objectName: String,
     override val description: String?,
-) : JaktaLogEvent {
+) : EnvironmentEvent {
     constructor(objectName: String) : this(objectName, "Reached object $objectName")
 }
