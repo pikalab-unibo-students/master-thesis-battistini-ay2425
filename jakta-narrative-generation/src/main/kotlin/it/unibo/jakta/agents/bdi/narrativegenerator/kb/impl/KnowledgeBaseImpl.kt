@@ -43,9 +43,17 @@ internal class KnowledgeBaseImpl(
     ): KBRetrievalResult {
         val logEventContainer = logEntry.message
         val clauses = eventSerializer.convert(id, logEventContainer.event).map { Clause.of(it) }
-        val localDate = LocalDateTime.parse(logEntry.timestamp.substringBefore("Z"))
-        val timeInMilliseconds = localDate.atOffset(ZoneOffset.UTC).toInstant().toEpochMilli()
-        val timeClause = Clause.of(Struct.of("time", Atom.of(id), Numeric.of(timeInMilliseconds)))
+
+        val timestamp =
+            try {
+                val localDate = LocalDateTime.parse(logEntry.timestamp.substringBefore("Z"))
+                val timeInMilliseconds = localDate.atOffset(ZoneOffset.UTC).toInstant().toEpochMilli()
+                timeInMilliseconds
+            } catch (_: Exception) {
+                logEntry.timestamp.toLong()
+            }
+        val timeClause = Clause.of(Struct.of("time", Atom.of(id), Numeric.of(timestamp)))
+
         val agentID =
             if (logEntry.message.event !is EnvironmentChange) {
                 Clause.of(

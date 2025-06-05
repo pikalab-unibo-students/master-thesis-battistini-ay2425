@@ -1,6 +1,6 @@
 package it.unibo.jakta.agents.bdi.narrativegenerator.serialization
 
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
 import it.unibo.jakta.agents.bdi.engine.serialization.modules.SerializersModuleProvider
 import it.unibo.jakta.agents.bdi.narrativegenerator.logging.PatternMatchLogEvent
 import kotlinx.serialization.modules.SerializersModule
@@ -12,7 +12,7 @@ import org.koin.core.annotation.Single
 class NarrativeGenerationJsonModule : SerializersModuleProvider {
     override val modules =
         SerializersModule {
-            polymorphic(JaktaLogEvent::class) {
+            polymorphic(LogEvent::class) {
                 subclass(PatternMatchLogEvent::class)
             }
         }

@@ -11,6 +11,7 @@ import it.unibo.tuprolog.core.Term
 import kotlin.collections.iterator
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.IllegalCallableAccessException
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberProperties
 
@@ -36,6 +37,7 @@ internal class EventSerializerImpl(
         val terms = mutableListOf<Struct>()
         val properties = obj::class.memberProperties
 
+        // Skip properties that can't be accessed due to visibility
         for (property in properties) {
             try {
                 @Suppress("UNCHECKED_CAST")
@@ -48,10 +50,8 @@ internal class EventSerializerImpl(
 
                 terms.addAll(processValue(id, value, config, currentPath, depth + 1))
             } catch (_: IllegalAccessException) {
-                // Skip properties we can't access
                 continue
-            } catch (_: kotlin.reflect.full.IllegalCallableAccessException) {
-                // Skip properties we can't access due to visibility
+            } catch (_: IllegalCallableAccessException) {
                 continue
             }
         }

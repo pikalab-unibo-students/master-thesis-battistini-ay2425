@@ -5,13 +5,13 @@ import it.unibo.jakta.agents.bdi.narrativegenerator.model.PatternClause
 import it.unibo.jakta.agents.bdi.narrativegenerator.model.SiftingPattern
 import it.unibo.tuprolog.core.Rule
 import it.unibo.tuprolog.core.Var
-import it.unibo.tuprolog.dsl.LogicProgrammingScope
+import it.unibo.tuprolog.dsl.jakta.JaktaLogicProgrammingScope
 
 @PatternDsl
 class PatternScope(
     val name: String,
     val converter: PatternConverter = PatternConverter.of(),
-) : LogicProgrammingScope by LogicProgrammingScope.empty() {
+) : JaktaLogicProgrammingScope by JaktaLogicProgrammingScope.empty() {
     val eventClauses = mutableListOf<PatternClause>()
     val rules = mutableListOf<Rule>()
     var description = ""
@@ -21,7 +21,7 @@ class PatternScope(
         f: ConstraintScope.() -> Unit,
     ): PatternClause = ConstraintScope(eventVar).also(f).build()
 
-    override fun rule(function: LogicProgrammingScope.() -> Any): Rule = super.rule(function).also { rule(it) }
+    override fun rule(function: JaktaLogicProgrammingScope.() -> Any): Rule = super.rule(function).also { rule(it) }
 
     fun rule(rule: Rule) {
         rules += rule

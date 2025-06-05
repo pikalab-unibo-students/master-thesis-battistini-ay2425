@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    api(project(":jakta-dsl"))
     api(project(":jakta-bdi"))
 
     api(libs.tuprolog.core)

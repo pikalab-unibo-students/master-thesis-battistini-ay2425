@@ -10,6 +10,7 @@ data class EventProcessingResult(
     val eventId: String,
     val newMatches: List<PatternMatch>,
     val activePartialMatches: Int,
+    val timeTook: Long? = null,
 )
 
 /**
@@ -20,8 +21,5 @@ data class PartialMatch(
     val clauseIndex: Int,
     val bindings: Substitution,
     val matchedEventIds: List<String> = emptyList(),
-    val isDead: Boolean = false,
     val isComplete: Boolean = false,
-) {
-    fun markDead(): PartialMatch = copy(isDead = true)
-}
+)

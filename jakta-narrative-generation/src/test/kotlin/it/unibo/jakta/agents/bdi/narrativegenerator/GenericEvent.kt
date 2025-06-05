@@ -1,8 +1,8 @@
-package narrativegenerator
+package it.unibo.jakta.agents.bdi.narrativegenerator
 
 import it.unibo.jakta.agents.bdi.engine.AgentID
 import it.unibo.jakta.agents.bdi.engine.logging.events.EventType
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,7 +12,7 @@ data class GenericEvent(
     val target: AgentID? = null,
     val tag: Set<String> = emptySet(),
     override val description: String?,
-) : JaktaLogEvent {
+) : LogEvent {
     companion object {
         fun of(
             type: String,

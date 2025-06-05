@@ -23,17 +23,15 @@ data class IncrementalPatternMatcher(
      */
     fun processEvent(
         eventId: String,
-        baseKB: KnowledgeBase,
-        eventsKB: KnowledgeBase,
+        kb: KnowledgeBase,
         patterns: List<SiftingPattern>,
     ): IncrementalPatternMatcher {
         log("Processing event \"$eventId\" against ${patterns.size} patterns")
 
-        // Create new partial matches from patterns
         val newStartMatches =
             patterns.mapNotNull { pattern ->
                 log("Trying to start match with pattern: ${pattern.name}")
-                val newMatch = tryStartMatch(pattern, baseKB, eventId)
+                val newMatch = tryStartMatch(pattern, kb, eventId)
                 if (newMatch != null) {
                     log("Created new partial match for pattern ${pattern.name}, clauseIndex=${newMatch.clauseIndex}")
                 } else {
@@ -42,55 +40,56 @@ data class IncrementalPatternMatcher(
                 newMatch
             }
 
-        // Process existing partial matches
         log("Updating ${partialMatches.size} existing partial matches")
-        val processedMatches =
-            partialMatches.flatMap { partialMatch ->
-                if (partialMatch.isDead || partialMatch.isComplete) {
-                    listOf(partialMatch)
-                } else {
-                    log(
-                        "Processing partial match for pattern ${partialMatch.pattern.name}, clauseIndex=${partialMatch.clauseIndex}",
-                    )
-                    val pattern = patterns.find { it.name == partialMatch.pattern.name }
+        val processedMatches = mutableListOf<PartialMatch>()
+        val completedPatterns = mutableSetOf<String>()
 
-                    if (pattern != null) {
-                        // Check unless constraints
-                        if (violatesUnlessConstraints(pattern, eventsKB, partialMatch)) {
-                            log("Match violates unless constraints, marking as dead")
-                            listOf(partialMatch.markDead())
-                        } else {
-                            // Try to advance the match
-                            log("Trying to advance match")
-                            val advancedMatch = tryAdvanceMatch(pattern, baseKB, partialMatch, eventId)
-
-                            if (advancedMatch != null) {
-                                log("Advanced match to clauseIndex=${advancedMatch.clauseIndex}")
-                                // Keep both the original and advanced matches
-                                listOf(partialMatch, advancedMatch)
-                            } else {
-                                log("Failed to advance match")
-                                // No advancement, keep original
-                                listOf(partialMatch)
-                            }
-                        }
-                    } else {
-                        log("Pattern ${partialMatch.pattern.name} not found in current patterns list")
-                        listOf(partialMatch)
-                    }
-                }
+        for (partialMatch in partialMatches) {
+            if (partialMatch.isComplete) {
+                processedMatches += partialMatch
+                completedPatterns += partialMatch.pattern.name
+                continue
             }
 
-        // Filter active partial matches
-        val activeMatches = (newStartMatches + processedMatches).filter { !it.isDead && !it.isComplete }
+            log(
+                "Processing partial match for pattern ${partialMatch.pattern.name}, clauseIndex=${partialMatch.clauseIndex}",
+            )
 
-        // Find newly completed matches
+            if (completedPatterns.contains(partialMatch.pattern.name)) {
+                log("Skipping match for ${partialMatch.pattern.name} since a completed one already exists")
+                processedMatches += partialMatch
+                continue
+            }
+
+            val pattern = patterns.find { it.name == partialMatch.pattern.name }
+
+            if (pattern != null) {
+                log("Trying to advance match")
+                val advancedMatch = tryAdvanceMatch(pattern, kb, partialMatch, eventId)
+
+                if (advancedMatch != null) {
+                    log("Advanced match to clauseIndex=${advancedMatch.clauseIndex}")
+                    processedMatches += advancedMatch
+                    if (advancedMatch.isComplete) {
+                        completedPatterns += pattern.name
+                    }
+                } else {
+                    log("Failed to advance match")
+                    processedMatches += partialMatch
+                }
+            } else {
+                log("Pattern ${partialMatch.pattern.name} not found in current patterns list")
+                processedMatches += partialMatch
+            }
+        }
+
+        val activeMatches = (newStartMatches + processedMatches).filter { !it.isComplete }
+
         val newCompletions =
             (newStartMatches + processedMatches)
                 .filter { it.isComplete && !completedMatches.contains(createPatternMatch(it)) }
                 .map { createPatternMatch(it) }
 
-        // Update completed matches
         val allCompletedMatches = completedMatches + newCompletions
 
         return copy(
@@ -189,35 +188,6 @@ data class IncrementalPatternMatcher(
             matchedEventIds = partialMatch.matchedEventIds + eventId,
             isComplete = isComplete,
         )
-    }
-
-    /**
-     * Check if an event violates any unless constraints for a partial match
-     */
-    private fun violatesUnlessConstraints(
-        pattern: SiftingPattern,
-        kb: KnowledgeBase,
-        partialMatch: PartialMatch,
-    ): Boolean {
-        val unlessClauses = pattern.clauses.filter { it.isUnlessClause }
-        if (unlessClauses.isEmpty()) {
-            log("No unless constraints to check")
-            return false
-        }
-
-        log("Checking ${unlessClauses.size} unless constraints")
-        val violations =
-            unlessClauses.filter { unlessClause ->
-                val matches = matchEventClause(unlessClause, kb, partialMatch.bindings)
-                if (matches != null && matches.isSuccess) {
-                    log("Constraint violated")
-                } else {
-                    log("Constraint not violated")
-                }
-                matches?.isSuccess == true
-            }
-
-        return violations.isNotEmpty()
     }
 
     /**

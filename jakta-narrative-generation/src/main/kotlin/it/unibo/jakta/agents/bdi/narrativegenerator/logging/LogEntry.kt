@@ -2,8 +2,8 @@ package it.unibo.jakta.agents.bdi.narrativegenerator.logging
 
 import it.unibo.jakta.agents.bdi.engine.AgentID
 import it.unibo.jakta.agents.bdi.engine.MasID
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEventContainer
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEventContext
 import it.unibo.jakta.agents.bdi.engine.plangeneration.PgpID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,7 +16,7 @@ data class LogEntry(
     val ecsVersion: String,
     @SerialName("log.level")
     val logLevel: String,
-    val message: JaktaLogEventContainer,
+    val message: LogEventContext,
     @SerialName("process.thread.name")
     val processThreadName: String,
     @SerialName("log.logger")
@@ -24,10 +24,10 @@ data class LogEntry(
 ) {
     companion object {
         fun create(
-            message: JaktaLogEvent,
-            masID: MasID = MasID("masID"),
-            agentID: AgentID = AgentID("agentID"),
-            pgpID: PgpID = PgpID("pgpId"),
+            message: LogEvent,
+            masID: MasID? = MasID("masID"),
+            agentID: AgentID? = AgentID("agentID"),
+            pgpID: PgpID? = PgpID("pgpId"),
             timestamp: String = System.currentTimeMillis().toString(),
             ecsVersion: String = "1.20.0",
             logLevel: String = "INFO",
@@ -38,7 +38,7 @@ data class LogEntry(
                 timestamp,
                 ecsVersion,
                 logLevel,
-                JaktaLogEventContainer(message, masID, agentID, pgpID),
+                LogEventContext(message, masID, agentID, pgpID),
                 processThreadName,
                 logLogger,
             )
