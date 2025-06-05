@@ -27,6 +27,19 @@ object SiftingPatterns {
             +"$Owner requested $Thing from $Robot"
         }
 
+    /**
+     * Feature: Beer Request and Delivery
+     *
+     * As an owner,
+     * I want to request beer from my robot,
+     * So that I can receive it without leaving my seat.
+     *
+     * Scenario: Beer delivered when available
+     *
+     * Given the owner requests a beer,
+     * When there is beer in stock and daily limit not reached,
+     * Then the robot fetches beer from the fridge and delivers it to the owner.
+     */
     val thingRequestAndDelivery =
         pattern("ThingRequestAndDelivery") {
             val FetchEvent = varOf("Fetch")
@@ -57,6 +70,19 @@ object SiftingPatterns {
                 """.trimIndent()
         }
 
+    /**
+     * Feature: Daily Limit Enforcement
+     *
+     * As a robot following health department rules,
+     * I want to enforce daily beer consumption limits,
+     * So that I comply with regulations.
+     *
+     * Scenario: Robot refuses beer request when daily limit reached
+     *
+     * Given the owner has reached the daily beer limit,
+     * When the owner requests another beer,
+     * Then the robot refuses the request and explains the health department regulation.
+     */
     val dailyLimitEnforcement =
         pattern("DailyLimitEnforcement") {
             val RejectEvent = varOf("rReject")
@@ -83,6 +109,19 @@ object SiftingPatterns {
                 """.trimIndent()
         }
 
+    /**
+     * Feature: Out of Stock Handling
+     *
+     * As a robot,
+     * I want to detect when beer is out of stock and order more,
+     * So that I can continue serving the owner's requests.
+     *
+     * Scenario: Robot reorders when stock reaches the minimum threshold
+     *
+     * Given that the owner requests a beer,
+     * When the robot checks and finds no beer in stock,
+     * Then the robot orders more beer from the supermarket.
+     */
     val outOfStockOrdering =
         pattern("OutOfStockOrdering") {
             val StockCheck = varOf("Check")
@@ -114,6 +153,17 @@ object SiftingPatterns {
                 """.trimIndent()
         }
 
+    /**
+     * As a supermarket,
+     * I want to process and deliver beer orders from robots,
+     * So that they can maintain their stock.
+     *
+     * Scenario: Order processed and delivered
+     *
+     * Given the robot has ordered beer from the supermarket,
+     * When the supermarket processes the order,
+     * Then the supermarket delivers the beer to the robot and updates its beer stock.
+     */
     val thingDelivery =
         pattern("ThingDelivery") {
             val OrderReceived = varOf("Receive")
@@ -148,6 +198,19 @@ object SiftingPatterns {
                 """.trimIndent()
         }
 
+    /**
+     * Feature: Owner's Time Check Behavior
+     *
+     * As an owner,
+     * I want to check the time when I'm bored,
+     * So that I can stay informed.
+     *
+     * Scenario: Robot provides current time when asked
+     *
+     * Given the owner is bored,
+     * When the owner asks the robot for the current time,
+     * Then the robot responds with the correct time.
+     */
     val timeCheckBehavior =
         pattern("TimeCheckBehavior") {
             val TimeRequest = varOf("Request")
