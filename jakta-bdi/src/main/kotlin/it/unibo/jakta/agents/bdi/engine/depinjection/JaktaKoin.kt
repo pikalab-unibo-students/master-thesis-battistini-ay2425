@@ -19,6 +19,7 @@ object JaktaKoin {
                         }
                     }
                 Json {
+                    allowStructuredMapKeys = true
                     ignoreUnknownKeys = true
                     serializersModule = combinedModule
                 }

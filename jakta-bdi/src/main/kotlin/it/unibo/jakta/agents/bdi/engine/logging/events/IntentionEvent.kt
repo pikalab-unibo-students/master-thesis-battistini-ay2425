@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("IntentionEvent")
-sealed interface IntentionEvent : JaktaLogEvent {
+sealed interface IntentionEvent : AgentEvent {
     val intention: Intention
 
     @Serializable

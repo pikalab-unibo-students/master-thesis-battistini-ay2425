@@ -58,7 +58,7 @@ import it.unibo.jakta.agents.bdi.engine.logging.events.GoalEvent.GoalAchieved
 import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent.AssignPlanToExistingIntention
 import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent.AssignPlanToNewIntention
 import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent.IntentionGoalRun
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.MessageEvent.MessageReceived
 import it.unibo.jakta.agents.bdi.engine.logging.events.PlanEvent.PlanSelected
 import it.unibo.jakta.agents.bdi.engine.messages.Tell
@@ -76,7 +76,7 @@ internal data class AgentLifecycleImpl(
     private val isSourceIgnored = agent.generationStrategy != null
     private val generationManager = GenerationManager.of(agent.logger, agent.loggingConfig)
 
-    private fun log(event: JaktaLogEvent) = agent.logger?.log { event }
+    private fun log(event: LogEvent) = agent.logger?.log { event }
 
     override fun updateBelief(
         perceptions: BeliefBase,

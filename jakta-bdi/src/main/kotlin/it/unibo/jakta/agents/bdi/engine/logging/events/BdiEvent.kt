@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("BDIEvent")
-sealed interface BdiEvent : JaktaLogEvent {
+sealed interface BdiEvent : AgentEvent {
     @Serializable
     @SerialName("EventSelected")
     data class EventSelected(

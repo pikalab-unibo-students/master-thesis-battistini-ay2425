@@ -8,6 +8,7 @@ import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig.Companion.LOG_SERV
 import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig.Companion.LOG_TO_CONSOLE
 import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig.Companion.LOG_TO_FILE
 import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig.Companion.LOG_TO_SERVER
+import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig.Companion.LOG_TO_SINGLE_FILE
 import org.apache.logging.log4j.Level
 
 class LoggingConfigScope : ScopeBuilder<LoggingConfig> {
@@ -16,6 +17,7 @@ class LoggingConfigScope : ScopeBuilder<LoggingConfig> {
     var logToFile: Boolean = LOG_TO_FILE
     var logToConsole: Boolean = LOG_TO_CONSOLE
     var logToServer: Boolean = LOG_TO_SERVER
+    var logToSingleFile: Boolean = LOG_TO_SINGLE_FILE
     var logLevel: Level = LOG_LEVEL
 
     fun debug() {
@@ -40,6 +42,7 @@ class LoggingConfigScope : ScopeBuilder<LoggingConfig> {
             logToFile = logToFile,
             logToConsole = logToConsole,
             logToServer = logToServer,
+            logToSingleFile = logToSingleFile,
             logLevel = logLevel,
             logDir = logDir,
         )

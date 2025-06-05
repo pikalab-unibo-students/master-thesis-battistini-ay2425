@@ -1,7 +1,7 @@
 package it.unibo.jakta.agents.bdi.engine.actions.effects
 
 import it.unibo.jakta.agents.bdi.engine.Agent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.EnvironmentEvent
 import it.unibo.jakta.agents.bdi.engine.messages.Message
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @SerialName("EnvironmentChange")
 sealed interface EnvironmentChange :
     SideEffect,
-    JaktaLogEvent
+    EnvironmentEvent
 
 @Serializable
 @SerialName("SpawnAgent")

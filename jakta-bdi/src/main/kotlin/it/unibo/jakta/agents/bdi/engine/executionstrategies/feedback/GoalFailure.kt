@@ -2,8 +2,8 @@ package it.unibo.jakta.agents.bdi.engine.executionstrategies.feedback
 
 import it.unibo.jakta.agents.bdi.engine.actions.ActionSignature
 import it.unibo.jakta.agents.bdi.engine.formatters.DefaultFormatters.termFormatter
+import it.unibo.jakta.agents.bdi.engine.serialization.modules.SerializableTerm
 import it.unibo.tuprolog.core.Struct
-import it.unibo.tuprolog.core.Term
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,10 +14,10 @@ sealed interface GoalFailure : NegativeFeedback {
     @SerialName("InvalidActionArityError")
     data class InvalidActionArityError(
         val actionSignature: ActionSignature,
-        val providedArguments: List<Term>,
+        val providedArguments: List<SerializableTerm>,
         override val description: String?,
     ) : GoalFailure {
-        constructor(actionSignature: ActionSignature, providedArguments: List<Term>) : this(
+        constructor(actionSignature: ActionSignature, providedArguments: List<SerializableTerm>) : this(
             actionSignature,
             providedArguments,
             "The arity of the action \"${actionSignature.name}\" is not correct: expected ${actionSignature.arity}, " +
@@ -29,10 +29,10 @@ sealed interface GoalFailure : NegativeFeedback {
     @SerialName("ActionSubstitutionFailure")
     data class ActionSubstitutionFailure(
         val actionSignature: ActionSignature,
-        val providedArguments: List<Term>,
+        val providedArguments: List<SerializableTerm>,
         override val description: String?,
     ) : GoalFailure {
-        constructor(actionSignature: ActionSignature, providedArguments: List<Term>) : this(
+        constructor(actionSignature: ActionSignature, providedArguments: List<SerializableTerm>) : this(
             actionSignature,
             providedArguments,
             "The action \"${actionSignature.name}\" could not be applied with the given arguments: " +
@@ -59,10 +59,10 @@ sealed interface GoalFailure : NegativeFeedback {
     @SerialName("ActionFailure")
     data class ActionFailure(
         val actionSignature: ActionSignature,
-        val providedArguments: List<Term>,
+        val providedArguments: List<SerializableTerm>,
         override val description: String?,
     ) : GoalFailure {
-        constructor(actionSignature: ActionSignature, providedArguments: List<Term>) : this(
+        constructor(actionSignature: ActionSignature, providedArguments: List<SerializableTerm>) : this(
             actionSignature,
             providedArguments,
             "The action \"${actionSignature.name}\" failed with the given arguments: " +

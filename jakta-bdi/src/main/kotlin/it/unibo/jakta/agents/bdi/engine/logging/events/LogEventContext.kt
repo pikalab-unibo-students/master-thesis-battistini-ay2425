@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * A container class for Jakta log events.
+ * A wrapper class for Jakta log events.
  *
  * This class wraps a `JaktaLogEvent` instance and includes optional identifiers for the multi-agent system (MAS),
  * the agent, and the plan generation procedure (PGP) associated with the event.
@@ -18,9 +18,9 @@ import kotlinx.serialization.Serializable
  * @property pgpID The optional identifier of the plan generation procedure associated with the event.
  */
 @Serializable
-@SerialName("JaktaLogEvent")
-data class JaktaLogEventContainer(
-    val event: JaktaLogEvent,
+@SerialName("LogEvent")
+data class LogEventContext(
+    val event: LogEvent,
     val masID: MasID? = null,
     val agentID: AgentID? = null,
     val pgpID: PgpID? = null,

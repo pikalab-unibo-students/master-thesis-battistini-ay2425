@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("MessageEvent")
-sealed interface MessageEvent : JaktaLogEvent {
+sealed interface MessageEvent : AgentEvent {
     @Serializable
     @SerialName("MessageReceived")
     data class MessageReceived(

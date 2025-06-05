@@ -44,7 +44,7 @@ import it.unibo.jakta.agents.bdi.engine.logging.events.ActionEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.BdiEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.GoalEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.MessageEvent
 import it.unibo.jakta.agents.bdi.engine.logging.events.PlanEvent
 import it.unibo.jakta.agents.bdi.engine.plans.ActivationRecord
@@ -52,13 +52,17 @@ import it.unibo.jakta.agents.bdi.engine.plans.Plan
 import it.unibo.jakta.agents.bdi.engine.plans.impl.ActivationRecordImpl
 import it.unibo.jakta.agents.bdi.engine.plans.impl.PartialPlanImpl
 import it.unibo.jakta.agents.bdi.engine.plans.impl.PlanImpl
+import it.unibo.jakta.agents.bdi.engine.serialization.AtomSerializer
 import it.unibo.jakta.agents.bdi.engine.serialization.FallbackSerializer
 import it.unibo.jakta.agents.bdi.engine.serialization.RuleSerializer
 import it.unibo.jakta.agents.bdi.engine.serialization.SignatureSerializer
 import it.unibo.jakta.agents.bdi.engine.serialization.StructSerializer
+import it.unibo.jakta.agents.bdi.engine.serialization.TermSerializer
 import it.unibo.jakta.agents.bdi.engine.serialization.VarSerializer
+import it.unibo.tuprolog.core.Atom
 import it.unibo.tuprolog.core.Rule
 import it.unibo.tuprolog.core.Struct
+import it.unibo.tuprolog.core.Term
 import it.unibo.tuprolog.core.Var
 import it.unibo.tuprolog.solve.Signature
 import kotlinx.serialization.modules.SerializersModule
@@ -70,13 +74,15 @@ import org.koin.core.annotation.Single
 class JaktaJsonModule : SerializersModuleProvider {
     override val modules =
         SerializersModule {
+            contextual(Term::class, TermSerializer)
+            contextual(Atom::class, AtomSerializer)
             contextual(Var::class, VarSerializer)
             contextual(Struct::class, StructSerializer)
             contextual(Rule::class, RuleSerializer)
             contextual(Signature::class, SignatureSerializer)
             contextual(Any::class, FallbackSerializer)
 
-            polymorphic(JaktaLogEvent::class) {
+            polymorphic(LogEvent::class) {
                 // Feedback event
                 subclass(GoalFailure.InvalidActionArityError::class)
                 subclass(GoalFailure.ActionSubstitutionFailure::class)

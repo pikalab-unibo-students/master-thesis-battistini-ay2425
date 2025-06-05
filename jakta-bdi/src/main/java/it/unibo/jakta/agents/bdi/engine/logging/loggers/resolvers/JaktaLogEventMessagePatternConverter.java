@@ -12,20 +12,20 @@ import org.apache.logging.log4j.util.PerformanceSensitive;
 
 import static it.unibo.jakta.agents.bdi.engine.logging.loggers.JaktaLogger.resolveObjectMessage;
 
-@Plugin(name = "JaktaLogEventPatternConverter", category = PatternConverter.CATEGORY)
+@Plugin(name = "JaktaLogEventMessagePatternConverter", category = PatternConverter.CATEGORY)
 @ConverterKeys({"d", "descr", "description"})
 @PerformanceSensitive("allocation")
-public class JaktaLogEventPatternConverter extends LogEventPatternConverter {
+public class JaktaLogEventMessagePatternConverter extends LogEventPatternConverter {
     private final MessagePatternConverter internalConverter;
 
-    private static final JaktaLogEventPatternConverter INSTANCE = new JaktaLogEventPatternConverter();
+    private static final JaktaLogEventMessagePatternConverter INSTANCE = new JaktaLogEventMessagePatternConverter();
 
-    private JaktaLogEventPatternConverter() {
+    private JaktaLogEventMessagePatternConverter() {
         super("Message", "message");
         this.internalConverter = MessagePatternConverter.newInstance(null, null);
     }
 
-    public static JaktaLogEventPatternConverter newInstance(final String[] options) {
+    public static JaktaLogEventMessagePatternConverter newInstance(final String[] options) {
         return INSTANCE;
     }
 

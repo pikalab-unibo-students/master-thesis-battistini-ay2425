@@ -3,8 +3,9 @@ package it.unibo.jakta.agents.bdi.engine.logging.loggers
 import it.unibo.jakta.agents.bdi.engine.AgentID
 import it.unibo.jakta.agents.bdi.engine.MasID
 import it.unibo.jakta.agents.bdi.engine.executionstrategies.feedback.NegativeFeedback
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEvent
-import it.unibo.jakta.agents.bdi.engine.logging.events.JaktaLogEventContainer
+import it.unibo.jakta.agents.bdi.engine.logging.events.IntentionEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEvent
+import it.unibo.jakta.agents.bdi.engine.logging.events.LogEventContext
 import it.unibo.jakta.agents.bdi.engine.plangeneration.PgpID
 import kotlinx.serialization.json.Json
 import org.apache.logging.log4j.LogManager
@@ -16,7 +17,7 @@ import java.net.URI
 interface JaktaLogger {
     val logger: Logger
 
-    fun log(event: () -> JaktaLogEvent)
+    fun log(event: () -> LogEvent)
 
     fun trace(message: () -> Any?) = logger.trace(message)
 
@@ -35,7 +36,7 @@ interface JaktaLogger {
         fun resolveObjectMessage(message: ObjectMessage): String {
             val param = message.parameter
             return when (param) {
-                is JaktaLogEventContainer -> param.event.description ?: ""
+                is LogEventContext -> param.event.description ?: ""
                 else -> param.toString()
             }
         }
@@ -54,11 +55,11 @@ interface JaktaLogger {
             }
 
             when (param) {
-                is JaktaLogEventContainer -> {
+                is LogEventContext -> {
                     try {
-                        val jsonString = json.encodeToString(JaktaLogEventContainer.serializer(), param)
+                        val jsonString = json.encodeToString(LogEventContext.serializer(), param)
                         jsonWriter.writeRawString(jsonString)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         jsonWriter.writeString(param.toString())
                     }
                 }
@@ -67,7 +68,7 @@ interface JaktaLogger {
             }
         }
 
-        internal fun extractHostnameAndPort(urlString: String): Pair<String, Int?> =
+        fun extractHostnameAndPort(urlString: String): Pair<String, Int?> =
             try {
                 val url = URI(urlString)
                 val hostname = url.host
@@ -80,14 +81,15 @@ interface JaktaLogger {
 
         fun Logger.implementation(
             masID: MasID,
-            event: () -> JaktaLogEvent,
+            event: () -> LogEvent,
             agentID: AgentID? = null,
             pgpID: PgpID? = null,
         ) {
             val eventInstance by lazy(event)
             when (val e = eventInstance) {
-                is NegativeFeedback -> this.warn { ObjectMessage(JaktaLogEventContainer(e, masID, agentID, pgpID)) }
-                else -> this.info { ObjectMessage(JaktaLogEventContainer(e, masID, agentID, pgpID)) }
+                is IntentionEvent -> {}
+                is NegativeFeedback -> this.warn { ObjectMessage(LogEventContext(e, masID, agentID, pgpID)) }
+                else -> this.info { ObjectMessage(LogEventContext(e, masID, agentID, pgpID)) }
             }
         }
     }

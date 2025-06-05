@@ -8,7 +8,7 @@ import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFact
 import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration
 
-object LoggerFactory {
+object LoggerConfigurator {
     private val configBuilder: ConfigurationBuilder<BuiltConfiguration> =
         ConfigurationBuilderFactory.newConfigurationBuilder()
 

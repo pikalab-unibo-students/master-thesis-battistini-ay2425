@@ -1,17 +1,17 @@
 package it.unibo.jakta.agents.bdi.engine.logging.loggers.appenders
 
-import it.unibo.jakta.agents.bdi.engine.Jakta.separator
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.CONSOLE_APPENDER_NAME
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.TCP_APPENDER_NAME
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.addFileAppender
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.addTcpAppender
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.jsonLayout
-import it.unibo.jakta.agents.bdi.engine.logging.LoggerFactory.logFilePatternLayout
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.CONSOLE_APPENDER_NAME
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.TCP_APPENDER_NAME
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.addFileAppender
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.addTcpAppender
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.jsonLayout
+import it.unibo.jakta.agents.bdi.engine.logging.LoggerConfigurator.logFilePatternLayout
 import it.unibo.jakta.agents.bdi.engine.logging.LoggingConfig
 
 object Appenders {
     fun buildAppenders(
-        name: String,
+        appenderName: String,
+        logFilePath: String,
         loggingConfig: LoggingConfig,
     ): List<String> {
         val appenders = mutableListOf<String>()
@@ -21,18 +21,19 @@ object Appenders {
         }
 
         if (loggingConfig.logToFile) {
-            val logFileAppenderName = "$name-LogFile"
+            val logFileAppenderName = "$appenderName-LogFile"
+            val jsonFileAppenderName = "$appenderName-JsonLinesFile"
+
             addFileAppender(
                 logFileAppenderName,
-                "${loggingConfig.logDir}$separator$name.log",
+                "$logFilePath.log",
                 logFilePatternLayout,
             )
             appenders.add(logFileAppenderName)
 
-            val jsonFileAppenderName = "$name-JsonLinesFile"
             addFileAppender(
                 jsonFileAppenderName,
-                "${loggingConfig.logDir}$separator$name.jsonl",
+                "$logFilePath.jsonl",
                 jsonLayout,
             )
             appenders.add(jsonFileAppenderName)
