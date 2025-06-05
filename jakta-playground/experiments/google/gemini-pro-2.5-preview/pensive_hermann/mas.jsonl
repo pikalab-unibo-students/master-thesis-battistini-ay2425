@@ -1,2 +1,0 @@
-{"@timestamp":"2025-05-04T12:17:00.18454293+02:00","message":"Added External action move","logger_name":"mas","thread_name":"main","level":"INFO","level_value":20000,"eventType":"ActionAddition","actionName":"move","actionType":"External"}
-{"@timestamp":"2025-05-04T12:17:00.194527033+02:00","message":"Added External action getDirectionToMove","logger_name":"mas","thread_name":"main","level":"INFO","level_value":20000,"eventType":"ActionAddition","actionName":"getDirectionToMove","actionType":"External"}
